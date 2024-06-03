@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { InputNumber } from 'primereact/inputnumber';
 import { RadioButton } from "primereact/radiobutton";
 import { Button } from 'primereact/button';
+import api from './api';
 
 function App() {
   
@@ -20,6 +21,22 @@ function App() {
 
   // service
   const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState(null);
+
+  const handleCalculate = async () => {
+    setLoading(true);
+    try {
+      const response = await api.post(selectedOp.endpoint, {
+        num1: num1,
+        num2: num2
+      });
+      setResult(response.data.resultado); 
+      setLoading(false);
+    } catch (error) {
+      console.error('Hubo un error', error);
+      setLoading(false);
+    }
+  };
 
   return (
     <div className='app'>
@@ -52,12 +69,16 @@ function App() {
               <label>Ingresa el segundo número</label>
               <InputNumber value={num2} onValueChange={(e) => setNum2(e.value)} min={0} max={10000} maxFractionDigits={2} />
           </div>
-          <Button className='calculate-button' label="Calcular" icon="pi pi-calculator" loading={loading} onClick={() => {}} />
+          <Button className='calculate-button' label="Calcular" icon="pi pi-calculator" loading={loading} onClick={handleCalculate} />
         </div>
         <div className='result'>
-            <h2>Resultado</h2>
-            <p>El resultado de {selectedOp?.verbo} {num1} y {num2} es:</p>
-            <h3>7.28</h3>
+          {
+            result && <>
+              <h2>Resultado</h2>
+              <p>El resultado de {selectedOp?.verbo} {num1} y {num2} es:</p>
+              <h3>{result}</h3>
+            </>
+          }
         </div>
         <footer className='footer'>
           <div className='footer__names'>
@@ -67,11 +88,11 @@ function App() {
             <p>Juan Miño</p>
           </div>
           <div className='footer__logo'>
-            <img src='./src/assets/udla_logo.png' alt='Logo de la UDLA'></img>
+            <img src='/udla_logo.png' alt='Logo de la UDLA' />
           </div>
           <div className='footer__desc'>
             <p>
-              Esta calculadora distribuida utiliza AWS Lambdas para poder generar el resultado de una operación seleccionada entre dos números
+              Esta calculadora distribuida utiliza AWS Lambda y API Gateway, asignando cada operación matemática a un Lambda independiente
             </p>
           </div>
         </footer>
