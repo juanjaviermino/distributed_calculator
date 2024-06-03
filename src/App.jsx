@@ -12,10 +12,10 @@ function App() {
 
   // options
   const [operations, setOperations] = useState([
-    {displayName: 'Suma', endpoint: '/suma', verbo: 'sumar'},
-    {displayName: 'Resta', endpoint: '/resta', verbo: 'restar'},
-    {displayName: 'Multiplicación', endpoint: '/multiplicacion', verbo: 'multiplicar'},
-    {displayName: 'División', endpoint: '/division', verbo: 'dividir'},
+    {displayName: 'Suma', endpoint: '/CalculatorSum', verbo: 'sumar'},
+    {displayName: 'Resta', endpoint: '/CalculatorSub', verbo: 'restar'},
+    {displayName: 'Multiplicación', endpoint: '/CalculatorMul', verbo: 'multiplicar'},
+    {displayName: 'División', endpoint: '/CalculatorDiv', verbo: 'dividir'},
   ])
   const [selectedOp, setSelectedOp] = useState(operations[0]);
 
