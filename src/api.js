@@ -6,7 +6,16 @@ const api = axios.create({
     timeout: 10000, // Request timeout
     headers: {
         'Content-Type': 'application/json',
+        // Add more headers as needed here, for example:
+        'X-Requested-With': 'XMLHttpRequest', // This header can help with CORS
     }
+});
+
+// Interceptor to handle preflight
+api.interceptors.request.use(request => {
+    // Ensure credentials are sent with every request if needed
+    request.withCredentials = true;
+    return request;
 });
 
 export default api;
