@@ -6,6 +6,7 @@ const api = axios.create({
     timeout: 10000, // Request timeout
     headers: {
         'Content-Type': 'application/json',
+        'Origin': 'https://distributed-calculator.onrender.com'
     }
 });
 
