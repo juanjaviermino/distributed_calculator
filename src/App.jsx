@@ -1,11 +1,15 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { InputNumber } from 'primereact/inputnumber';
 import { RadioButton } from "primereact/radiobutton";
 import { Button } from 'primereact/button';
+import { Toast } from 'primereact/toast';
 import api from './api';
 
 function App() {
   
+  // Toast
+  const toast = useRef(null);
+
   // numbers
   const [num1, setNum1] = useState(0);
   const [num2, setNum2] = useState(0);
@@ -24,13 +28,19 @@ function App() {
   const [result, setResult] = useState(null);
 
   const handleCalculate = async () => {
+
+    if(selectedOp.displayName === 'División' && num2 === 0){
+        toast.current.show({ severity: 'error', summary: 'Error', detail: 'No se puede dividir para cero' });
+        return;
+    }
+
     setLoading(true);
     try {
       const response = await api.post(selectedOp.endpoint, {
         num1: num1,
         num2: num2
       });
-      setResult(response.data.resultado); 
+      setResult(response.data.respuesta); 
       setLoading(false);
     } catch (error) {
       console.error('Hubo un error', error);
@@ -40,6 +50,7 @@ function App() {
 
   return (
     <div className='app'>
+      <Toast ref={toast} />
       <h1 className='app__title'>Distributed calculator</h1>
       <div className='app__content'>
         <div className='form'>
@@ -73,11 +84,11 @@ function App() {
         </div>
         <div className='result'>
           {
-            result && <>
+            result || result === 0 ? <>
               <h2>Resultado</h2>
               <p>El resultado de {selectedOp?.verbo} {num1} y {num2} es:</p>
-              <h3>{result}</h3>
-            </>
+              <h3>{Number(result.toFixed(2))}</h3>
+            </> : <></>
           }
         </div>
         <footer className='footer'>
