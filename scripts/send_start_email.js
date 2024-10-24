@@ -1,4 +1,4 @@
-const nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
 
 const user = process.env.GMAIL_USER;
 const pass = process.env.GMAIL_APP_PASSWORD;
