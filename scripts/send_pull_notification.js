@@ -14,8 +14,8 @@ let transporter = nodemailer.createTransport({
 let mailOptions = {
   from: user,
   to: 'jminoarboleda@gmail.com',
-  subject: 'Verificación de estado',
-  text: "El estado del deployment es correcto",
+  subject: 'Pull request creada',
+  text: "Se ha creado un nuevo pull request",
 };
 
 transporter.sendMail(mailOptions, function (error, info) {

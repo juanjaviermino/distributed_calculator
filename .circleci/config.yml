@@ -65,21 +65,17 @@ jobs:
           command: node scripts/notify_failure.js
           when: on_fail
 
-  check_deployment_status:
+  notify_pull_request:
     docker:
       - image: cimg/node:14.17
     steps:
       - checkout
       - run:
-          name: Verificar estado del despliegue
-          command: |
-            echo "El despliegue está activo y funcionando correctamente."
-      - run:
           name: Instalar dependencias de correo
           command: npm install nodemailer
       - run:
-          name: Enviar correo de estado del despliegue
-          command: node scripts/check_deployment_status.js
+          name: Enviar cnotificación de Pull Request
+          command: node scripts/send_pull_notification.js
 
 workflows:
   version: 2
@@ -97,12 +93,9 @@ workflows:
           requires:
             - test
 
-  workflow_notify:
-    triggers:
-      - schedule:
-          cron: "* * * * *"  
-          filters:
-            branches:
-              only: main
+  workflow_pull_request:
     jobs:
-      - check_deployment_status
+      - notify_pull_request
+    filters:
+      branches:
+        ignore: main
