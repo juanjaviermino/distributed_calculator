@@ -82,7 +82,10 @@ workflows:
 
   workflow_build_and_deploy:
     jobs:
-      - send_start_email
+      - send_start_email:
+          filters:
+              branches:
+                only: main
       - build:
           requires:
             - send_start_email
