@@ -13,20 +13,14 @@ jobs:
           name: Enviar correo de inicio
           command: node scripts/send_start_email.js
 
-  install_dependencies:
-    docker:
-      - image: cimg/node:14.17
-    steps:
-      - checkout
-      - run:
-          name: Instalar dependencias del proyecto
-          command: npm install
-
   build:
     docker:
       - image: cimg/node:14.17
     steps:
       - checkout
+      - run:
+          name: Instalar dependencias
+          command: npm install
       - run:
           name: Construir la aplicación
           command: npm run build
@@ -93,12 +87,9 @@ workflows:
   workflow_build_and_deploy:
     jobs:
       - send_start_email
-      - install_dependencies:
-          requires:
-            - send_start_email
       - build:
           requires:
-            - install_dependencies
+            - send_start_email
       - test:
           requires:
             - build
