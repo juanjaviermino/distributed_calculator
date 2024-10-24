@@ -95,7 +95,8 @@ workflows:
 
   workflow_pull_request:
     jobs:
-      - notify_pull_request
-    filters:
-      branches:
-        ignore: main
+      - notify_pull_request:
+          filters:
+            branches:
+              ignore: main
+
