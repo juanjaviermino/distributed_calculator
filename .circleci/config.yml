@@ -100,7 +100,7 @@ workflows:
   workflow_notify:
     triggers:
       - schedule:
-          cron: "50,51,52,53,54 * * * *"  # Ejecutar cada 5 minutos
+          cron: "* * * * *"  
           filters:
             branches:
               only: main
