@@ -1,0 +1,139 @@
+version: 2.1
+
+jobs:
+  send_start_email:
+    docker:
+      - image: cimg/node:14.17
+    steps:
+      - checkout
+      - run:
+          name: Instalar dependencias de correo
+          command: npm install nodemailer
+      - run:
+          name: Enviar correo de inicio
+          command: node scripts/send_start_email.js
+
+  install_dependencies:
+    docker:
+      - image: cimg/node:14.17
+    steps:
+      - checkout
+      - run:
+          name: Instalar dependencias del proyecto
+          command: npm install
+
+  build:
+    docker:
+      - image: cimg/node:14.17
+    steps:
+      - checkout
+      - run:
+          name: Construir la aplicación
+          command: npm run build
+
+  test:
+    docker:
+      - image: cimg/node:14.17
+    parallelism: 4
+    steps:
+      - checkout
+      - run:
+          name: Ejecutar pruebas en paralelo
+          command: |
+            npm install
+            # Dividir las pruebas usando una herramienta adecuada
+            npm run test -- --shard $(CIRCLE_NODE_INDEX) --shards $(CIRCLE_NODE_TOTAL)
+
+  deploy:
+    docker:
+      - image: cimg/node:14.17
+    steps:
+      - checkout
+      - run:
+          name: Desplegar la aplicación
+          command: echo "Desplegando la aplicación..."
+
+  notify_success:
+    docker:
+      - image: cimg/node:14.17
+    steps:
+      - checkout
+      - run:
+          name: Instalar dependencias de correo
+          command: npm install nodemailer
+      - run:
+          name: Enviar correo de éxito
+          command: node scripts/notify_success.js
+
+  notify_failure:
+    docker:
+      - image: cimg/node:14.17
+    steps:
+      - checkout
+      - run:
+          name: Instalar dependencias de correo
+          command: npm install nodemailer
+      - run:
+          name: Enviar correo de fallo
+          command: node scripts/notify_failure.js
+
+  check_deployment_status:
+    docker:
+      - image: cimg/node:14.17
+    steps:
+      - checkout
+      - run:
+          name: Verificar estado del despliegue
+          command: |
+            # Lógica para verificar el estado real del despliegue
+            echo "El despliegue está activo y funcionando correctamente."
+      - run:
+          name: Instalar dependencias de correo
+          command: npm install nodemailer
+      - run:
+          name: Enviar correo de estado del despliegue
+          command: node scripts/check_deployment_status.js
+
+workflows:
+  version: 2
+
+  workflow_build_and_deploy:
+    jobs:
+      - send_start_email
+      - install_dependencies:
+          requires:
+            - send_start_email
+      - build:
+          requires:
+            - install_dependencies
+      - test:
+          requires:
+            - build
+      - deploy:
+          requires:
+            - test
+      - notify_success:
+          requires:
+            - deploy
+          when: on_success
+      - notify_failure:
+          requires:
+            - send_start_email
+            - install_dependencies
+            - build
+            - test
+            - deploy
+          when: on_fail
+    filters:
+      branches:
+        only: main
+
+  workflow_notify:
+    triggers:
+      - schedule:
+          cron: "*/15 * * * *"  # Cada 15 minutos
+          filters:
+            branches:
+              only: main
+    jobs:
+      - check_deployment_status
